@@ -6,3 +6,4 @@ numpy
 scikit-learn
 PyMuPDF
 faiss
+PyMuPDF

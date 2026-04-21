@@ -1,77 +1,77 @@
-import streamlit as st
+# ------------------ PROCESS LOGIC ------------------
+if uploaded_file:
 
-st.set_page_config(layout="wide", initial_sidebar_state="collapsed")
+    import fitz  # PyMuPDF
+    import tempfile
 
-# ---- Hide Sidebar + Dark Background ----
-st.markdown("""
-<style>
-section[data-testid="stSidebar"] {display: none;}
-footer {visibility: hidden;}
-body {background-color:#0B0F19;}
-            
-div.stButton > button:hover {
-    box-shadow: 0px 0px 20px rgba(79,140,255,0.5);
-    transform: translateY(-2px);
-}
-            
-</style>
-""", unsafe_allow_html=True)
+    # 🔥 Save uploaded file temporarily
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+        tmp.write(uploaded_file.read())
+        pdf_path = tmp.name
 
-# ---- HEADER ----
-col1, col2 = st.columns([6,2])
+    # 🔥 Extract text properly
+    doc = fitz.open(pdf_path)
 
-with col1:
-    st.markdown("<h2 style='color:white;'>ScholarAI</h2>", unsafe_allow_html=True)
+    text = ""
+    for page in doc:
+        text += page.get_text()
 
-with col2:
-    c1, c2, c3 = st.columns(3)
+    text = text[:3000]  # limit for speed
 
-    with c1:
-        if st.button("Home", key="home_compare"):
-            st.switch_page("app.py")
+    st.success("✅ Paper loaded successfully!")
 
-    with c2:
-        if st.button("Analyze", key="analyze_compare"):
-            st.switch_page("pages/Analyze.py")
+    # -------- RESEARCH GAPS --------
+    if gap_btn:
+        with st.spinner("Finding research gaps..."):
+            prompt = f"""
+You are a research expert.
 
-    with c3:
-        if st.button("Compare", key="compare_compare"):
-            st.switch_page("pages/Compare.py")
+Identify research gaps in this paper.
+Give clear bullet points.
 
-st.markdown("<hr>", unsafe_allow_html=True)
+Paper:
+{text}
+"""
+            result = llm.generate(prompt)
+            st.subheader("Research Gaps")
+            st.write(result)
 
-# ---- PAGE TITLE ----
-st.markdown(
-    "<h1 style='color:white;'>Compare Research Papers</h1>",
-    unsafe_allow_html=True
-)
+    # -------- METHOD BREAKDOWN --------
+    if method_btn:
+        with st.spinner("Analyzing methodology..."):
+            prompt = f"""
+Explain the methodology used in this paper in simple terms.
 
-st.markdown(
-    "<p style='color:#A0AEC0;'>Upload 2 or more papers for AI comparison.</p>",
-    unsafe_allow_html=True
-)
+Paper:
+{text}
+"""
+            result = llm.generate(prompt)
+            st.subheader("Method Breakdown")
+            st.write(result)
 
-# ---- FILE UPLOADER ----
-uploaded_files = st.file_uploader(
-    "Upload PDFs",
-    type=["pdf"],
-    accept_multiple_files=True,
-    key="compare_uploader"
-)
+    # -------- LIMITATIONS --------
+    if limit_btn:
+        with st.spinner("Analyzing limitations..."):
+            prompt = f"""
+What are the limitations of this research paper?
+Give concise bullet points.
 
-# ---- COMPARE ACTION ----
-if uploaded_files:
-    if st.button("Compare Now", key="compare_now_btn"):
-        st.success("Comparison started...")
+Paper:
+{text}
+"""
+            result = llm.generate(prompt)
+            st.subheader("⚠️ Limitations")
+            st.write(result)
 
-        st.markdown(
-            "<div style='background:#111827;padding:25px;border-radius:16px;color:white;margin-top:20px;'>"
-            "<h3>Related Paper Suggestions</h3>"
-            "<ul>"
-            "<li>BERT: Pre-training of Deep Bidirectional Transformers</li>"
-            "<li>GPT: Improving Language Understanding</li>"
-            "<li>Transformer-XL</li>"
-            "</ul>"
-            "</div>",
-            unsafe_allow_html=True
-        )
+    # -------- IMPROVEMENTS --------
+    if improve_btn:
+        with st.spinner("Generating improvements..."):
+            prompt = f"""
+Suggest improvements or future enhancements for this paper.
+
+Paper:
+{text}
+"""
+            result = llm.generate(prompt)
+            st.subheader("Improvements")
+            st.write(result)

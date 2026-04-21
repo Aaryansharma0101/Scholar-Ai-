@@ -1,9 +1,5 @@
 streamlit
 groq
-transformers
-sentence-transformers
 numpy
 scikit-learn
-PyMuPDF
-faiss
-PyMuPDF
+pdfplumber
